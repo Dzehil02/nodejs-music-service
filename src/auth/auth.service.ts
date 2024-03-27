@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
@@ -11,7 +11,6 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
-    private readonly logger = new Logger(AuthService.name);
     constructor(
         private readonly userService: UserService,
         private readonly prismaService: PrismaService,
@@ -20,18 +19,12 @@ export class AuthService {
     ) {}
 
     async signup(dto: CreateUserDto) {
-        const user = await this.userService.create(dto).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
+        const user = await this.userService.create(dto);
         return user;
     }
 
     async login(dto: CreateUserDto): Promise<UserTokens> {
-        const user = await this.userService.findOneByLogin(dto.login).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
+        const user = await this.userService.findOneByLogin(dto.login);
 
         if (!user || !compareSync(dto.password, user.password)) {
             throw new ForbiddenException('Invalid login or password');
