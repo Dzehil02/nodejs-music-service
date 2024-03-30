@@ -16,8 +16,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
             path: request.url,
             timestamp: new Date().toISOString(),
         };
-
         this.loggingService.logError(result);
+
+        this.loggingService.writeErrorLogToFile(JSON.stringify(result));
+        this.loggingService.writeErrorLogToFile(exception.stack + '\n');
 
         response.status(status).json(result);
     }
