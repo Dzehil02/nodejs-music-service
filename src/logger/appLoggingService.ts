@@ -41,10 +41,7 @@ export class AppLoggingService {
         const files = readdirSync(logsPath);
         let lastFile = null;
         let timestamp = 0;
-        console.log('files');
-        console.log(files);
         files.forEach((file) => {
-            console.log(statSync(join(logsPath, file)).size);
             const filePath = join(logsPath, file);
             const stats = statSync(filePath);
             const { mtimeMs } = stats;
