@@ -1,4 +1,4 @@
-# Home Library Service (Docker)
+# Home Library Service (Logging & Error Handling and Authentication and Authorization)
 
 ### 1. Download this repository
 
@@ -6,33 +6,31 @@
 git clone {repository URL} or Download ZIP
 ```
 
-### 2. Create _.env_ file 
+### 2. Create _.env_ file
+
 Add **environment variables** (see _.env.example_ file) **or just rename _.env.example_ file to _.env_ file**
 
-### 3. Run Docker Desktop
+### 3. Run Application
 
-> _***! Check the ports and running containers in Docker.***_<br>
-> _***!! If the port is already occupied or other containers are already using the necessary resources, you will need to free up these resources or choose different ports for your application.***_
+> _***- We can use Docker:***_<br>
 
-### 4. Run Docker Container
+1. Open Docker Desktop
+2. Run Docker Container:
+    - _Open terminal and run app:_
+    - `npm run docker:up (or docker-compose up)`
 
-_Open terminal and run app:_
+> _***- We can start app in local machine:***_
 
-```
-npm run docker:up (or docker-compose up)
-```
+1. Set up DATABASE_URL in the .env file to connect to the database
+2. Install dependencies `npm install`
+3. Start application `npm run start:dev`
 
-___OR___ _To download the images from Docker Hub and run the application, use the command:_
-
-```
-npm run docker:up:pub (or docker-compose -f docker-compose.pub.yml up)
-```
-
-> _***!!!***_ - "application is restarting upon changes implemented into src folder" - This feature doesn't work in the current mode. **Only when running the command: npm run docker:up**
+### 4. Use Home Library Service
 
 -   After starting the app on port (**4000 as default**) you can open
     in your browser OpenAPI documentation by typing http://localhost:4000/doc
 
+-   **Sign up and login to get access token** and use it for requests
 -   All requests are available by URL http://localhost:4000/
 
 _Examples:_
@@ -60,37 +58,31 @@ response -> [
     }
 ]
 ```
+
+-   To change the logging level, set the **LOG_LEVEL** environment variable (verbose | debug | log | warn | error)
+-   The file size for rotation can be configured using the **MAX_FILE_SIZE** environment variable
+
 ### 5. Run vulnerabilities scanning
+
 ```
 npm run docker:scout:app
 npm run docker:scout:db
 ```
+
 ### 6. Run tests
 
 **After application running open new terminal and enter:**
 
-_To run all tests without authorization_
+_To run all tests with authorization_
 
 ```
-npm run test (or npm run docker:test)
+npm run test:auth (or npm run docker:test)
 ```
 
-_To run only one of all test suites_
+_To run refresh tests_
 
 ```
-npm run test -- <path to suite>
-```
-
-_To run all test with authorization_
-
-```
-npm run test:auth
-```
-
-_To run only specific test suite with authorization_
-
-```
-npm run test:auth -- <path to suite>
+npm run test:refresh (or npm run docker:test:refresh)
 ```
 
 ### 7. For auto-fix and format you can use:

@@ -27,7 +27,8 @@
         "docker:down": "docker-compose down -v",
         "docker:up:pub": "docker-compose -f docker-compose.pub.yml up",
         "docker:down:pub": "docker-compose -f docker-compose.pub.yml down -v",
-        "docker:test": "docker exec -it app npm run test",
+        "docker:test": "docker exec -it app npm run test:auth",
+        "docker:test:refresh": "docker exec -it app npm run test:refresh",
         "docker:scout:app": "docker scout cves dzehil02/nodejs2024q1-service-app-hls-dev",
         "docker:scout:db": "docker scout cves dzehil02/nodejs2024q1-service-db-hls-dev"
     },
