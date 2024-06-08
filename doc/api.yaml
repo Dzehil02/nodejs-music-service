@@ -104,6 +104,30 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Track'
+        Login:
+            type: object
+            properties:
+                userId:
+                    type: string
+                    format: uuid
+                login:
+                    type: string
+                    example: 'TestUser'
+                accessToken:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MTY0N2RiMC1lYWI3LTExZWUtYWU4NC1lZmI2YmE2YTMxODMiLCJsb2dpbiI6ImFkbWluIiwiaWF0IjoxNzExMzc5MzQ5LCJleHAiOjE3MTEzODI5NDl9.YbQlf718qdZ_6yFO-Nz0aRqDgkh2-0FsVkKd1zv_fNc'
+                refreshToken:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MTY0N2RiMC1lYWI3LTExZWUtYWU4NC1lZmI2YmE2YTMxODMiLCJsb2dpbiI6ImFkbWluIiwiaWF0IjoxNzExMzc5MzQ5LCJleHAiOjE3MTE0NjU3NDl9.UT3nKF2VLa9J4IbSkrcGCYJ0mczeiYVsAbKUrkUSToU'
+        Tokens:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MTY0N2RiMC1lYWI3LTExZWUtYWU4NC1lZmI2YmE2YTMxODMiLCJsb2dpbiI6ImFkbWluIiwiaWF0IjoxNzExMzc5MzQ5LCJleHAiOjE3MTEzODI5NDl9.YbQlf718qdZ_6yFO-Nz0aRqDgkh2-0FsVkKd1zv_fNc'
+                refreshToken:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3MTY0N2RiMC1lYWI3LTExZWUtYWU4NC1lZmI2YmE2YTMxODMiLCJsb2dpbiI6ImFkbWluIiwiaWF0IjoxNzExMzc5MzQ5LCJleHAiOjE3MTE0NjU3NDl9.UT3nKF2VLa9J4IbSkrcGCYJ0mczeiYVsAbKUrkUSToU'
     responses:
         UnauthorizedError:
             description: Access token is missing or invalid
@@ -117,13 +141,13 @@ security:
     - bearerAuth: []
 
 paths:
-    /login:
+    /auth/login:
         post:
             tags:
                 - Login
             security: []
             summary: Login
-            description: Logins a user and returns a JWT-token
+            description: Login a user and returns a JWT-tokens
             requestBody:
                 required: true
                 content:
@@ -137,7 +161,7 @@ paths:
                                     description: Username
                                 password:
                                     type: string
-                                    description: Password
+                                    description: string
                             required:
                                 - user
                                 - login
@@ -147,14 +171,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    token:
-                                        type: string
-                                description: JWT Token
+                                $ref: '#/components/schemas/Login'
+                400:
+                    description: Bad request. Body does not contain required fields or they are not strings
                 403:
-                    description: Incorrect login or password
-    /signup:
+                    description: Incorrect login or password. Doesn't match actual user
+    /auth/signup:
         post:
             tags:
                 - Signup
@@ -185,11 +207,43 @@ paths:
             responses:
                 204:
                     description: Successful signup
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
                 400:
-                    description: Bad request
-                409:
-                    description: Conflict. Login already exists
-    /users:
+                    description: Bad request. Body does not contain required fields or they are not strings
+    /auth/refresh:
+        post:
+            tags:
+                - Refresh
+            security: []
+            summary: Refresh
+            description: Refresh tokens. Get new pair of Access token and Refresh token
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            title: example
+                            properties:
+                                refreshToken:
+                                    type: string
+                            required:
+                                - refreshToken
+            responses:
+                200:
+                    description: Access token and Refresh token
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Tokens'
+                401:
+                    description: Bad request. Body does not contain required fields.
+                403:
+                    description: Authentication failed. Refresh token is invalid or expired.
+    /user:
         get:
             tags:
                 - Users
@@ -239,7 +293,7 @@ paths:
                     description: Bad request. body does not contain required fields
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
-    /users/{userId}:
+    /user/{userId}:
         parameters:
             - name: userId
               in: path
@@ -334,7 +388,7 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 404:
                     description: User not found
-    /tracks:
+    /track:
         get:
             tags:
                 - Track
@@ -388,7 +442,7 @@ paths:
                     description: Bad request. body does not contain required fields
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
-    /tracks/{id}:
+    /track/{id}:
         parameters:
             - name: id
               in: path
@@ -492,7 +546,7 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 404:
                     description: Track was not found.
-    /albums:
+    /album:
         get:
             tags:
                 - Album
@@ -544,7 +598,7 @@ paths:
                     description: Bad request. body does not contain required fields
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
-    /albums/{id}:
+    /album/{id}:
         parameters:
             - name: id
               in: path
@@ -621,7 +675,7 @@ paths:
                     $ref: '#/components/responses/UnauthorizedError'
                 404:
                     description: Album was not found.
-    /artists:
+    /artist:
         get:
             tags:
                 - Artist
@@ -668,7 +722,7 @@ paths:
                     description: Bad request. body does not contain required fields
                 401:
                     $ref: '#/components/responses/UnauthorizedError'
-    /artists/{id}:
+    /artist/{id}:
         parameters:
             - name: id
               in: path

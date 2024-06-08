@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  
+  // If .env file cannot be read assign url as in the example:
+  // url = "postgresql://myuser:mypassword@db:5432/mydb?schema=public"
+}
+
+model User {
+  id String @id @default(uuid())
+  login String
+  password String
+  version Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userTokens UserTokens?
+} 
+
+model Artist {
+  id String @id @default(uuid())
+  name String
+  grammy Boolean @default(false)
+  tracks Track[]
+  albums Album[]
+  favorites Favorites? @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  favoritesId String?
+}
+
+model Track {
+  id String @id @default(uuid())
+  name String
+  artistId String?
+  albumId String?
+  duration Int
+  artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  album Album? @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  favorites Favorites? @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  favoritesId String?
+}
+
+model Album {
+  id String @id @default(uuid())
+  name String
+  year Int
+  artistId String?
+  artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  tracks Track[]
+  favorites Favorites? @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  favoritesId String?
+}
+
+model Favorites {
+  id String @id @default(uuid())
+  artists Artist[]
+  tracks Track[]
+  albums Album[]
+}
+
+model UserTokens {
+  id String @id @default(uuid())
+  refreshToken String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+}
