@@ -1,5 +1,9 @@
-# Home Library Service (Logging & Error Handling and Authentication and Authorization)
-
+# Home Library Music Service
+- Authentication and Authorization
+- Error Handling
+- Logging
+- Docker
+- Prisma
 ### 1. Download this repository
 
 ```
